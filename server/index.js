@@ -9,8 +9,11 @@ app.get('/user', (req, res) => {
         nome: 'Arthur',
         sobrenome: 'Ryan'
     }
-res.json(pessoa);
+    res.json(pessoa);
 })
 
+app.post('/mirror', (req, res) =>{
+    res.json(req.body);
+})
 
 app.listen(3000, 'localhost', () => console.log('Servidor rodando'));
