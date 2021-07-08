@@ -13,3 +13,6 @@ app.use(express.urlencoded({
 app.use(express.json());
 
 module.exports = app;
+
+const usersRouter = require('../users/controller/user-controller');
+app.use('/users', usersRouter);
