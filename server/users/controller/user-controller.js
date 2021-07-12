@@ -1,5 +1,10 @@
 const router = require('express').Router();
+const { session } = require('passport');
+const passport = require('passport');
+const { noExtendLeft } = require('sequelize/types/lib/operators');
 const UserService = require('../service/UserService');
+const jwt = require('jsonwebtoken');
+
 
 router.post('/', async (req, res) => {
     try {
@@ -63,9 +68,44 @@ router.delete('/user/:id', async (req,res) =>{
     }
 });
 
+router.post('/login', async (req, res, next) =>{ //rota de autenticação de login
+    passport.authenticate(
+        'login',
+        (error, user, info) =>{
+            try {
+                if(error){
+                    return next(error);
+                }
 
+                req.login(
+                    user,
+                    {session: false},
+                    (error) => {
+                        if(error) next(error);
 
+                        const body = {
+                            id: user.id,
+                            role: user.role
+                        }
 
+                        const token = jwt.sign({user: body}, process.env.SECRET_KEY, 
+                        {expiresIn: process.env.JWT_EXPIRATION});
 
+                        res.cookie('jwt', token, {
+                            httpOnly: true,
+                            secure: process.env.NODE_ENV === 'production',
+                        });
+
+                        res.status(204).end();
+
+                    },
+                );
+
+            } catch (error) {
+                next(error);
+            }
+        },
+    )(req, res, next);
+});
 
 module.exports = router;
