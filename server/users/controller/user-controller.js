@@ -67,13 +67,13 @@ router.delete('/user/:id', async (req,res) =>{
     }
 });
 
-router.post('/login', async (req, res, next) =>{ //rota de autenticação de login
+router.post('/login', (req, res, next) =>{ 
     passport.authenticate(
         'login',
-        (error, user, info) =>{
+        (err, user, info) =>{
             try {
-                if(error){
-                    return next(error);
+                if(err){
+                    return next(err);
                 }
 
                 req.login(
@@ -84,11 +84,10 @@ router.post('/login', async (req, res, next) =>{ //rota de autenticação de log
 
                         const body = {
                             id: user.id,
-                            role: user.role
-                        }
+                            role: user.role,
+                        };
 
-                        const token = jwt.sign({user: body}, process.env.SECRET_KEY, 
-                        {expiresIn: process.env.JWT_EXPIRATION});
+                        const token = jwt.sign({user: body}, process.env.SECRET_KEY, {expiresIn: '1h'});
 
                         res.cookie('jwt', token, {
                             httpOnly: true,
@@ -96,7 +95,6 @@ router.post('/login', async (req, res, next) =>{ //rota de autenticação de log
                         });
 
                         res.status(204).end();
-
                     },
                 );
 
