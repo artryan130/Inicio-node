@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { session } = require('passport');
 const passport = require('passport');
-const { noExtendLeft } = require('sequelize/types/lib/operators');
 const UserService = require('../service/UserService');
 const jwt = require('jsonwebtoken');
 
