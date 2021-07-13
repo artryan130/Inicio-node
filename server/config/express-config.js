@@ -13,12 +13,12 @@ app.use(cors());
 
 app.use(express.json());
 
-module.exports = app;
-
-const usersRouter = require('../users/controller/user-controller');
-app.use('/users', usersRouter);
-
 require('./auth');
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
+
+const usersRouter = require('../users/controller/user-controller');
+app.use('/users', usersRouter);
+
+module.exports = app;

@@ -1,9 +1,10 @@
 const router = require('express').Router();
-const { session } = require('passport');
-const passport = require('passport');
 const UserService = require('../service/UserService');
-const jwt = require('jsonwebtoken');
-
+const {
+    loginMiddleware, 
+    notLoggedIn, 
+    jwtMiddleware, 
+    checkRole} = require('../../middlewares/auth-middlewares');
 
 router.post('/', async (req, res) => {
     try {
@@ -23,7 +24,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/', async (req, res) =>{
+router.get('/', jwtMiddleware, async (req, res) =>{ //retornando todos usuários
     try {
      const users = await UserService.getAllUsers();
      
@@ -33,7 +34,7 @@ router.get('/', async (req, res) =>{
     }
 });
 
-router.get('/user/:id', async (req, res) =>{
+router.get('/user/:id', jwtMiddleware, async (req, res) =>{ //retornar usuario por id
     try {
     const userId = req.params.id;
     const user = await UserService.getUserById(userId);
@@ -44,69 +45,33 @@ router.get('/user/:id', async (req, res) =>{
     }
 });
 
-router.put('/user/:id', async (req, res) =>{
+router.put('/user/:id', jwtMiddleware, async (req, res) =>{ //alterar por id
     try {
     const userId = req.params.id;
-    await UserService.updateUser(userId, req.body);
+    await UserService.updateUser(userId, req.user.id, req.user.role, req.body);
 
     res.status(204).end();    
     } catch (error) {
-        console.log(error);
+        res.status(401).send(error.message);
     }
 
 });
 
-router.delete('/user/:id', async (req,res) =>{
+router.delete('/user/:id', jwtMiddleware, checkRole('admin'), async (req,res) =>{ //deletar por id
     try {
     const userId = req.params.id;
-    await UserService.deleteUser(userId);
+    await UserService.deleteUser(userId, req.user.id);
     
     res.status(204).end();    
     } catch (error) {
-        console.log(error);
+        res.status(401).send(error.message);
     }
 });
 
-router.post('/login', (req, res, next) =>{ 
-    passport.authenticate(
-        'login',
-        (err, user, info) =>{
-            try {
-                if(err){
-                    return next(err);
-                }
+router.post('/login',notLoggedIn, loginMiddleware); //logar
 
-                req.login(
-                    user,
-                    {session: false},
-                    (error) => {
-                        if(error) next(error);
-
-                        const body = {
-                            id: user.id,
-                            role: user.role,
-                        };
-
-                        const token = jwt.sign({user: body}, process.env.SECRET_KEY, {expiresIn: '1h'});
-
-                        res.cookie('jwt', token, {
-                            httpOnly: true,
-                            secure: process.env.NODE_ENV === 'production',
-                        });
-
-                        res.status(204).end();
-                    },
-                );
-
-            } catch (error) {
-                next(error);
-            }
-        },
-    )(req, res, next);
-});
-
-
-router.get('/logout', (req, res) =>{
+    
+router.get('/logout', jwtMiddleware, (req, res) =>{ //deslogar
     try {
         res.clearCookie('jwt');
         res.status(204).end();
@@ -115,5 +80,9 @@ router.get('/logout', (req, res) =>{
     }
 });
 
+router.get('/me', jwtMiddleware, async (req, res) =>{
+    const user = await UserService.getCurrentUser(req.user.id)
+    res.status(200).json(user);
+})
 
 module.exports = router;

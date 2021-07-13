@@ -12,19 +12,41 @@ class UserService {
     }
 
     async  getAllUsers() {
-        return await User.findAll({raw: true});
+        return await User.findAll({raw: true, atributes: {exclude: ['password', 'createdAt', 'updatedAt']},});
     }
 
     async getUserById(id) {
-        return await User.findByPk(id, {raw: true} );
+        return await User.findByPk(id, {raw: true, atributes: {exclude: ['password', 'createdAt', 'updatedAt']},});
     }
 
-    async updateUser(id, body) {
-        await User.update(body, {where: {id: id}});
+    async updateUser(id, reqUserId, reqUserRole, body) {
+        const user = await User.findByPk(id);
+        
+        const isAdmin = reqUserRole === 'admin';
+        const isUpdateUser = reqUserId == id;
+
+        if(isAdmin || isUpdateUser){
+            if(!isAdmin && body.role){
+                throw new Error('Voce nao tem permissão para atualizar o seu papel de usuario')
+            }
+            await user.update(body);
+
+        }else{
+            throw new Error('Voce nao tem permissão para atualizar esse usuário');
+        }
     }
 
-    async deleteUser(id){
-        await User.destroy({where: {id: id}});
+    async deleteUser(id, reqUserId){
+        const user = await User.findByPk(id);
+        
+        if(id == reqUserId){
+            throw new Error ('Voce nao tem permissãio para se deletar!')
+        }
+        await user.destroy();
+    }
+
+    async getCurrentUser(id){
+        return await User.findByPk(id, {atributes: {exclude: ['password', 'createdAt', 'updatedAt']}});
     }
 }
 
