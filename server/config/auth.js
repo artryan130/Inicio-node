@@ -2,6 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const User = require('../users/model/User');
+const bcrypt = require('bcrypt');
 
 passport.use(
     'login',
@@ -20,7 +21,7 @@ passport.use(
                     throw new Error('E-mail e/ou senha incorretos');
                 }
 
-                const matchingPassword = (password === user.password);
+                const matchingPassword = await bcrypt.compare(password, user.password);
 
                 if(!matchingPassword){
                     throw new Error('E-mail e/ou senha incorretos');
