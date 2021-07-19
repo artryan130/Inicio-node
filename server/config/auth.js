@@ -1,8 +1,9 @@
 const passport = require('passport');
+const bcrypt = require('bcrypt');
 const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const User = require('../users/model/User');
-const bcrypt = require('bcrypt');
+const AuthorizationError = require('../error/AuthorizationError');
 
 passport.use(
     'login',
@@ -18,13 +19,13 @@ passport.use(
                 const user = await User.findOne({where: {email: email}});
                 
                 if(!user){
-                    throw new Error('E-mail e/ou senha incorretos');
+                    throw new AuthorizationError('E-mail e/ou senha incorretos');
                 }
 
                 const matchingPassword = await bcrypt.compare(password, user.password);
 
                 if(!matchingPassword){
-                    throw new Error('E-mail e/ou senha incorretos');
+                    throw new AuthorizationError('E-mail e/ou senha incorretos');
                 }
 
                 return done(null, user);

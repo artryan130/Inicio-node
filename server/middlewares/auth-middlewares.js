@@ -45,7 +45,7 @@ function jwtMiddleware(req, res, next){ //checar a permissão para realizar a a�
             return next(err);
         }
 
-        if(!user){
+        if(user){
             return res.status(401).send('Voce precisa estar logado para relizar essa ação');
         }
 
@@ -60,11 +60,12 @@ function checkRole(role){ //checar se a role do usuario que esta fazendo a req �
         if(req.user){
             if(req.user.role === role){
                 next();
-            }
-        }else{
+            
+            }else{
             res.status(401).send('Voce nao tem permissão para fazer essa ação');
-        }
-    };
+            }
+        };
+    }
 }
 
 function notLoggedIn(req, res, next){ //usuarios ja logados, nao logarem novamente

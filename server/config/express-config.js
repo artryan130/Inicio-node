@@ -4,21 +4,24 @@ const express = require('express');
 
 const app= express();
 
+const cors = require('cors');
+app.use(cors());
+
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 app.use(express.urlencoded({
     extended:true
 }));
-
-const cors = require('cors');
-app.use(cors());
 
 app.use(express.json());
 
 require('./auth');
 
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
-
 const usersRouter = require('../users/controller/user-controller');
 app.use('/users', usersRouter);
+
+const errorHandler = require('../middlewares/errorHandler');
+app.use(errorHandler());
 
 module.exports = app;
