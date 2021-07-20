@@ -1,5 +1,6 @@
 const sequelize = require('../../database/');
 const {DataTypes} = require('sequelize');
+const Product = require('./Product');
 
 const User = sequelize.define('User',{
     id:{
@@ -32,8 +33,19 @@ const User = sequelize.define('User',{
     },
 });
 
+User.hasMany(Product,{
+    onDelete: 'cascade',
+});
+Product.belongsTo(User);
+
 User.sync({alter: false, force: false})  //alter: caso ja tenha uma tabela apenas alterar e force: se nao tiver ele cria uma nova tabela
     .then(() => console.log('A tabela de usuarios foi (re)criado'))
     .catch((error) => console.log(error));
+
+
+Product.sync({alter: false, force: false})  
+    .then(() => console.log('A tabela de produtos foi (re)criado'))
+    .catch((error) => console.log(error));
+
 
 module.exports = User;
