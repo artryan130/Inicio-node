@@ -1,0 +1,35 @@
+.Login {
+    height: 100vh;
+    font-family: Nunito Sans;
+}
+
+.container{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex: 1;
+}
+
+.left{
+    width: 60%;
+    height: 100%;
+}
+
+.right {
+    color: #dddddd;
+    width: 40%;
+    height: 100%;
+    background-color: #f6f6f6;
+}
+
+/* sumindo com o welcome no mobile */
+
+@media screen and (max-width: 960px) {
+    .left{
+        display: none;
+    }
+
+    .right{
+        width: 100%;
+    }
+}
