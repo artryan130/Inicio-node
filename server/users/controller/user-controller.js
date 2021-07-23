@@ -11,7 +11,7 @@ const userValidate = require('../../middlewares/user-validator');
 
 router.post('/', objectFilter('body',['name', 'email', 'image', 'password']), 
 userValidate('creatUser'),
-async (req, res) => {
+async (req, res, next) => {
     try {
         const user = {
             name: req.body.name,
@@ -25,69 +25,69 @@ async (req, res) => {
     
     res.status(201).end();
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 });
 
-router.get('/', jwtMiddleware, async (req, res) =>{ //retornando todos usuários
+router.get('/', jwtMiddleware, async (req, res, next) =>{ //retornando todos usuários
     try {
      const users = await UserService.getAllUsers();
      
      res.status(200).json(users);   
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 });
 
-router.get('/user/:id', jwtMiddleware, async (req, res) =>{ //retornar usuario por id
+router.get('/user/:id', jwtMiddleware, async (req, res, next) =>{ //retornar usuario por id
     try {
     const userId = req.params.id;
     const user = await UserService.getUserById(userId);
     
     res.status(200).json(user);
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 });
 
 router.put('/user/:id', jwtMiddleware, objectFilter('body',['name', 'email', 'image', 'password']),
 userValidate('updateUser'),
-async (req, res) =>{ //alterar por id
+async (req, res, next) =>{ //alterar por id
     try {
     const userId = req.params.id;
     await UserService.updateUser(userId, req.user.id, req.user.role, req.body);
 
     res.status(204).end();    
     } catch (error) {
-        res.status(401).send(error.message);
+        next(error);
     }
 
 });
 
-router.delete('/user/:id', jwtMiddleware, checkRole('admin'), async (req,res) =>{ //deletar por id
+router.delete('/user/:id', jwtMiddleware, checkRole('admin'), async (req, res, next) =>{ //deletar por id
     try {
     const userId = req.params.id;
     await UserService.deleteUser(userId, req.user.id);
     
     res.status(204).end();    
     } catch (error) {
-        res.status(401).send(error.message);
+        next(error);
     }
 });
 
 router.post('/login',notLoggedIn, userValidate('login'), loginMiddleware); //logar
 
     
-router.get('/logout', jwtMiddleware, (req, res) =>{ //deslogar
+router.get('/logout', jwtMiddleware, (req, res, next) =>{ //deslogar
     try {
         res.clearCookie('jwt');
         res.status(204).end();
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 });
 
-router.get('/me', jwtMiddleware, async (req, res, next) =>{
+router.get('/me', async (req, res, next) =>{
     try{
     const user = await UserService.getCurrentUser(req.user.id)
     res.status(200).json(user);

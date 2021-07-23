@@ -17,12 +17,11 @@ function errorHandler(error, req, res, next){
     if(error instanceof UniqueConstrainError){
         status = 406;
         const field = error.errors[0].path.split('.')[1];
-        message = 'Ja existe um registro no sistema, com esse ${field}';
+       message = 'Ja existe um registro no sistema, com esse ${field}';
     }
 
     console.log(error);
     res.status(status).json(message);
-
 }
 
 module.exports = errorHandler;

@@ -7,6 +7,8 @@ import {BrowserRouter as Router,
 import axios from 'axios';
 import Home from './componentes/Home/Home';
 import Login from './componentes/Login/Login';
+import Dashboard from './componentes/Dashboard/Dashboard';
+
 
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -15,6 +17,9 @@ function App() {
 
     <Router>
       <Switch>
+      <Route path="/dashboard">
+          <Dashboard />
+        </Route>
         <Route path="/login">
           <Login />
         </Route>
