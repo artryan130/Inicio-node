@@ -67,7 +67,7 @@ class UserService {
     }
 
     async getCurrentUser(id){
-        const user = await User.findByPk(id, {atributes: {exclude: ['password', 'createdAt', 'updatedAt']}});
+        const user = await User.findByPk(id, {atributes: {exclude: ['password', 'createdAt', 'updatedAt']},});
     
         if(!user){
             throw new QueryError('Nao foi encontrado usuario com essa ID : ${id}')

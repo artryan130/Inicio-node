@@ -87,13 +87,13 @@ router.get('/logout', jwtMiddleware, (req, res, next) =>{ //deslogar
     }
 });
 
-router.get('/me', async (req, res, next) =>{
+router.get('/me', jwtMiddleware, async (req, res, next) => {
     try{
     const user = await UserService.getCurrentUser(req.user.id)
     res.status(200).json(user);
     }catch(error){
         next(error);
     }
-})
+});
 
 module.exports = router;

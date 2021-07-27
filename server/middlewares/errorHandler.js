@@ -1,6 +1,6 @@
 const AuthorizationError = require('../error/AuthorizationError');
 const QueryError = require('../error/QueryError');
-const {UniqueConstrainError} = require('sequelize');
+const {UniqueConstraintError} = require('sequelize');
 
 function errorHandler(error, req, res, next){
     const message = error.message;
@@ -14,7 +14,7 @@ function errorHandler(error, req, res, next){
         status = 406;
     }
 
-    if(error instanceof UniqueConstrainError){
+    if(error instanceof UniqueConstraintError){
         status = 406;
         const field = error.errors[0].path.split('.')[1];
        message = 'Ja existe um registro no sistema, com esse ${field}';
