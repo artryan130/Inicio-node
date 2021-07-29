@@ -27,6 +27,7 @@ function loginMiddleware(req, res, next){ // logar
                             httpOnly: true,
                             secure: process.env.NODE_ENV === 'production',
                         });
+                        console.log(token);
 
                         res.status(204).end();
                     },
@@ -40,12 +41,14 @@ function loginMiddleware(req, res, next){ // logar
 };
 
 function jwtMiddleware(req, res, next){ //checar a permissão para realizar a ação 
+    
     passport.authenticate('jwt', {session: false}, (err, user, info) => { 
+        console.log(user);
         if(err) {
             return next(err);
         }
 
-        if(user){
+        if(!user){
             return res.status(401).send('Voce precisa estar logado para relizar essa ação');
         }
 
@@ -68,7 +71,8 @@ function checkRole(role){ //checar se a role do usuario que esta fazendo a req �
     }
 }
 
-function notLoggedIn(req, res, next){ //usuarios ja logados, nao logarem novamente
+function notLoggedIn(){ //usuarios ja logados, nao logarem novamente
+    return (req, res, next) =>{
     const token = req.cookies['jwt'];
     if(token){
         jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
@@ -78,6 +82,7 @@ function notLoggedIn(req, res, next){ //usuarios ja logados, nao logarem novamen
         });
     }
     next();
+    }
 }
 
 module.exports = {

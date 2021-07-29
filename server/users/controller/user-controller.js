@@ -75,7 +75,7 @@ router.delete('/user/:id', jwtMiddleware, checkRole('admin'), async (req, res, n
     }
 });
 
-router.post('/login',notLoggedIn, userValidate('login'), loginMiddleware); //logar
+router.post('/login',notLoggedIn(), userValidate('login'), loginMiddleware); //logar
 
     
 router.get('/logout', jwtMiddleware, (req, res, next) =>{ //deslogar
